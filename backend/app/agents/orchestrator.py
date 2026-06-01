@@ -7,6 +7,7 @@ from app.agents.git_manager import commit_changes
 from app.agents.reviewer import review_code
 from app.agents.branch_manager import create_branch
 from app.agents.branch_namer import generate_branch_name
+from app.agents.git_push import push_branch
 
 from pathlib import Path
 
@@ -83,8 +84,13 @@ def run_agent(repo_path: str, task: str):
     
     # Commit changes automatically
     commit_sha = commit_changes(
-    project_root,
-    f"AI Agent: {task}"
+        project_root,
+        f"AI Agent: {task}"
+    )
+    
+    push_result = push_branch(
+        project_root,
+        branch_name
     )
     
     branch_name = generate_branch_name(
@@ -100,14 +106,14 @@ def run_agent(repo_path: str, task: str):
         "task": task,
         "branch": branch_name,
         "filename": filename,
-        "plan": plan,
         "saved_to": saved_path,
         "commit_sha": commit_sha,
+        "push": push_result,
+        "syntax_valid": True,
         "line_count": len(
             reviewed_code.splitlines()
         ),
-        "code_lines": reviewed_code.splitlines()
-        
+        "code_lines": reviewed_code.splitlines() 
     }
     
     if not valid:
